@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "MY-Image-Chip",
+    "description": "Paste or drop images into the composer as numbered inline chips; write captions next to each chip, hover to preview, drag to reposition. Images are sent to the model bound by number."
+  }
+}
