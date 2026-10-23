@@ -1,0 +1,6 @@
+{
+	"meta": {
+		"title": "MY-Window-Bounds 窗口记忆",
+		"description": "让桌面主窗口记住上次的大小、位置和最大化状态（等长补丁修补 app.asar，自动备份、可随时还原）。完全退出并重启 DSH 后生效。"
+	}
+}
