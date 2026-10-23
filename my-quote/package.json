@@ -1,6 +1,6 @@
 {
   "name": "my-quote",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "private": true,
   "type": "module",
   "description": "MY-Quote 划词引用：选中文字一键以气泡引用到输入框（悬停看全文），或新开分叉会话继续讨论（分叉在主会话区打开，可在右侧栏管理页统一打开/归档）。",
