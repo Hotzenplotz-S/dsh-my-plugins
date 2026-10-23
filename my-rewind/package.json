@@ -1,0 +1,22 @@
+{
+  "name": "my-rewind",
+  "version": "1.0.4",
+  "private": true,
+  "type": "module",
+  "description": "MY-Rewind 对话回退：消息上悬停点「回退」把对话撤回到该消息（文本+图片放回输入框），排队消息可一键撤回；/rewind、/undo 斜杠命令带消息选择器。v1 仅对话回退（文件还原规划中）。",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": ["index.js", "client.js", "cordis.patch.yml", "locale/*.json", "icon.svg", "README.md"],
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": ["@deepseek-ai/dsh-client-ui-conversation"]
+    }
+  }
+}
