@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "MY-Quote Selection Quoter",
+    "description": "Select chat text, then quote it into the composer as a hoverable chip, or fork the session to discuss it (the fork opens in the main conversation area and is listed in the right-sidebar manager page)."
+  }
+}
