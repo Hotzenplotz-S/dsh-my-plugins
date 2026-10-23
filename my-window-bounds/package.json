@@ -1,0 +1,26 @@
+{
+	"name": "my-window-bounds",
+	"version": "0.1.2",
+	"private": true,
+	"type": "module",
+	"description": "MY-Window-Bounds 窗口记忆：让 DSH 桌面主窗口记住上次的大小、位置和最大化状态。",
+	"exports": {
+		".": "./index.js",
+		"./locale/*.json": "./locale/*.json",
+		"./icon": "./icon.svg"
+	},
+	"files": [
+		"index.js",
+		"asar-patch.js",
+		"cli.mjs",
+		"cordis.patch.yml",
+		"locale/*.json",
+		"icon.svg",
+		"README.md"
+	],
+	"dsh": {
+		"bundle": {
+			"patch": "./cordis.patch.yml"
+		}
+	}
+}
