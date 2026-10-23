@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "MY-Rewind",
+    "description": "Message-level conversation rewind: jump back to any earlier message (its content returns to the input box), retract queued steering messages, and pick rewind targets from the /rewind & /undo slash commands. Append-only log, fully auditable."
+  }
+}
