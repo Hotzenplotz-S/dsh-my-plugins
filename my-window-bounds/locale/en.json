@@ -1,0 +1,6 @@
+{
+	"meta": {
+		"title": "MY-Window-Bounds",
+		"description": "Remembers the desktop main window's size, position, and maximized state across restarts (equal-length app.asar patch with automatic backup and one-command restore). Takes effect after a full quit and relaunch."
+	}
+}
