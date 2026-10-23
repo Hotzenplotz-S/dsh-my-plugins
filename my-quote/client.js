@@ -110,6 +110,10 @@ color:var(--dsw-alias-toast-label,#ffffff);border:1px solid var(--dsw-alias-bord
 font-family:inherit;font-size:12.5px;box-shadow:0 6px 20px rgba(0,0,0,.24);-webkit-app-region:no-drag}
 [data-composer-chip="${SOURCE_NAME}"]{cursor:grab}
 [data-composer-chip="${SOURCE_NAME}"]:active{cursor:grabbing}
+/* 输入框高度抖动缓解：为滚动区恒定预留滚动条槽位，消除"滚动条出现→可用宽度变→
+   重折行→高度变→滚动条消失"的边界振荡。原生类名 .RlGAzG_scroll 为打包哈希，
+   版本升级后可能失效，失效的最坏结果只是回到原生行为。 */
+[data-composer-card] .RlGAzG_scroll{scrollbar-gutter:stable}
 .myq-list{box-sizing:border-box;display:flex;flex-direction:column;gap:8px;height:100%;padding:10px 12px;
 font-size:12.5px;line-height:1.55;color:inherit;-webkit-app-region:no-drag}
 .myq-list-head{display:flex;align-items:center;gap:8px}
