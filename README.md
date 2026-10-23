@@ -11,6 +11,7 @@
 | [my-window-bounds](./my-window-bounds/) | MY-Window-Bounds 窗口记忆 | 让 DSH 桌面主窗口记住上次的大小、位置和最大化状态（等长 asar 补丁，自动备份、可一键还原） | 宿主 / 桌面主进程 |
 | [my-quote](./my-quote/) | MY-Quote 划词引用 | 选中对话文字一键以气泡引用到输入框（悬停看全文），或新开分叉会话继续讨论，附分叉管理页 | 客户端 UI |
 | [my-image-chip](./my-image-chip/) | MY-Image-Chip 图片气泡 | 粘贴/拖入图片时在输入框光标处插入编号气泡，说明文字写在气泡旁，图片与文字按编号一起发给模型；悬停看大图，可拖动换位 | 客户端 UI |
+| [my-rewind](./my-rewind/) | MY-Rewind 对话回退 | 消息悬停「回退」撤回到任意历史消息（文本+图片放回输入框），排队消息一键撤回；/rewind、/undo 命令带消息选择器；日志只增不改（dsh-rewind-plugin 的 MY 重构版，修复浮层透明重叠） | 宿主 + 客户端 UI |
 
 ## 安装方法
 
@@ -35,6 +36,8 @@ git clone https://github.com/Hotzenplotz-S/dsh-my-plugins.git
   原理与风险见其 [README](./my-window-bounds/README.md)。DSH 升级后补丁会自动重打，
   锚点对不上时会安全跳过并写状态文件，不会损坏安装。
 - my-quote 与其他划词浮条类插件（如 `dsh-client-ui-quote`）**不要同时启用**，会重复弹条。
+- my-rewind 与原版 `dsh-rewind-plugin` **不要同时启用**（命令名 rewind/undo/rewind-plugin 冲突；
+  my-rewind 已兼容旧会话的隐藏状态，可直接替换）。
 
 ## 目录即仓库
 
