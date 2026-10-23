@@ -1,0 +1,22 @@
+{
+  "name": "my-image-chip",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MY-Image-Chip 图片气泡：粘贴/拖入图片时在输入框光标处插入编号气泡（🖼 图片N），说明文字直接写在气泡旁，图片随文字一起按编号发给模型；悬停气泡看大图，可拖动气泡换位置。",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": ["index.js", "client.js", "cordis.patch.yml", "locale/*.json", "icon.svg", "README.md"],
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": ["@deepseek-ai/dsh-client-ui-conversation"]
+    }
+  }
+}
