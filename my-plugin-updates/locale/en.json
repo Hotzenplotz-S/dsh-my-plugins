@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "title": "MY-Plugin-Updates",
+    "description": "Check and upgrade all installed community plugins at once",
+    "update_all": "Upgrade All",
+    "checking": "Checking…",
+    "no_updates": "All plugins are up to date",
+    "excluded_self": "(official, local-dev and self excluded)",
+    "version_format": "{name}: {current} → {latest}",
+    "restart_hint": "Some plugins may need a DSH restart to take effect",
+    "errors": "Errors during upgrade:",
+    "exclusion_note": "Excluded:"
+  }
+}

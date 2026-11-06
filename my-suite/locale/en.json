@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "MY-Suite",
+    "description": "A collection of my small utilities. Each feature is a row with its own switch on the details page, effective immediately; switching off this core row disables the whole suite. Currently includes: Quote."
+  }
+}

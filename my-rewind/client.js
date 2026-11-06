@@ -39,10 +39,8 @@ window.__ModuleLoader__.load({
       "popover.retractConfirm": "撤回",
       "popover.cancel": "取消",
       "popover.noText": "（无文本）",
-      "toast.success": "已回退",
       "toast.failed": "回退失败，请重试",
       "toast.timeout": "回退超时，请查看会话状态",
-      "toast.retracted": "已撤回排队消息",
       "toast.retractFailed": "撤回失败，请重试"
     };
     const en = {
@@ -58,10 +56,8 @@ window.__ModuleLoader__.load({
       "popover.retractConfirm": "Retract",
       "popover.cancel": "Cancel",
       "popover.noText": "(no text)",
-      "toast.success": "Rewound",
       "toast.failed": "Rewind failed, please try again",
       "toast.timeout": "Rewind timed out — check the session state",
-      "toast.retracted": "Queued message retracted",
       "toast.retractFailed": "Retract failed, please try again"
     };
 
@@ -567,7 +563,7 @@ window.__ModuleLoader__.load({
         showToast(outcome.text ?? t("toast.failed"));
         return;
       }
-      showToast(t("toast.success"));
+      // 成功不提示：原文回填进输入框本身就是反馈（失败/超时仍保留 toast）
       if (!deps.isMainViewSession(face.sessionId)) return;
       const chat = deps.chatOf(face);
       if (chat === undefined) return;
@@ -599,7 +595,7 @@ window.__ModuleLoader__.load({
           return;
         }
       }
-      showToast(t("toast.retracted"));
+      // 成功不提示：文本回填即反馈
       if (typeof text === "string" && text !== "" && composerIsEmpty()) {
         deps.setComposerText(face.sessionId, text);
       }

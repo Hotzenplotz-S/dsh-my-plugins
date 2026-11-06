@@ -3,3 +3,8 @@ node_modules/
 .DS_Store
 Thumbs.db
 nul
+
+# 本地构建/调试中间产物
+.tmp/
+.tmp-*
+*.full.js

@@ -1,0 +1,37 @@
+{
+  "name": "my-suite",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "MY-Suite 功能合集：自研小功能合装一张卡片。当前收录：划词引用。",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./quote": "./features/quote/host.js",
+    "./quote/locale/*.json": "./features/quote/locale/*.json",
+    "./quote/icon": "./features/quote/icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "icon.svg",
+    "locale/*.json",
+    "features/**/host.js",
+    "features/**/icon.svg",
+    "features/**/locale/*.json",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  }
+}

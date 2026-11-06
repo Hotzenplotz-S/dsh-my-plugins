@@ -1,6 +1,6 @@
 {
 	"name": "my-window-bounds",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"private": true,
 	"type": "module",
 	"description": "MY-Window-Bounds 窗口记忆：让 DSH 桌面主窗口记住上次的大小、位置和最大化状态。",

@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "title": "MY-Plugin-Updates 插件更新",
+    "description": "一键检查并升级所有已安装的市场插件",
+    "update_all": "全部升级",
+    "checking": "正在检查…",
+    "no_updates": "所有插件已是最新版",
+    "excluded_self": "（已排除官方插件、本地开发插件和自身）",
+    "version_format": "{name}：{current} → {latest}",
+    "restart_hint": "部分插件需手动重启 DSH 后生效",
+    "errors": "以下插件升级失败：",
+    "exclusion_note": "排除的插件："
+  }
+}

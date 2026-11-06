@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "MY-Quote",
+    "description": "Select text in a conversation: quote it into the composer as a hoverable bubble showing the full text, or fork a new session to continue the discussion (forks open in the main session area and are managed from the right sidebar)."
+  }
+}

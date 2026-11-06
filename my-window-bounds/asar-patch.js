@@ -11,7 +11,13 @@
 //      in the JSON header; the JSON is padded with trailing spaces to its
 //      original byte length, so the pickle framing is untouched.
 //
-// A one-time backup (app.asar.mywb.bak) is written before the first patch.
+// A pristine backup (app.asar.mywb.bak) is kept next to the archive and
+// REFRESHED whenever the installed build changes (DSH auto-update replaces
+// app.asar with a new version). The refresh is keyed on the `version` field of
+// package.json inside the archive: if the backup's version differs from the
+// archive's — or either cannot be read — the backup is re-copied from the
+// archive while it is still pristine (i.e. before the marker is written).
+// This keeps `restore` safe: it can never copy an older build over a newer one.
 // All anchors must match exactly or the archive is left untouched.
 
 import { createHash } from "node:crypto";
@@ -194,6 +200,69 @@ export function backupPathFor(asarPath) {
 	return asarPath + ".mywb.bak";
 }
 
+/** Read one file entry out of an already-open archive. */
+function readEntryBuffer(fd, header, dataStart, path) {
+	const entry = findEntry(header, path);
+	if (!entry) return null;
+	const buf = Buffer.alloc(entry.size);
+	readSync(fd, buf, 0, entry.size, dataStart + Number(entry.offset || 0));
+	return buf;
+}
+
+/** `version` of the package.json inside the open archive, or null. */
+function versionOfEntry(fd, header, dataStart) {
+	try {
+		const buf = readEntryBuffer(fd, header, dataStart, "package.json");
+		if (!buf) return null;
+		const pkg = JSON.parse(buf.toString("utf8"));
+		return typeof pkg.version === "string" ? pkg.version : null;
+	} catch {
+		return null;
+	}
+}
+
+/** `version` of the package.json inside any archive file, or null. */
+export function readAsarVersion(asarPath) {
+	let fd;
+	try {
+		fd = openSync(asarPath, "r");
+		const { header, dataStart } = readHeader(fd);
+		return versionOfEntry(fd, header, dataStart);
+	} catch {
+		return null;
+	} finally {
+		if (fd !== undefined) {
+			try {
+				closeSync(fd);
+			} catch {}
+		}
+	}
+}
+
+/**
+ * Make sure the pristine backup matches the build being patched. MUST be called
+ * while `asarPath` is still unpatched, so the copy is a true pristine archive.
+ * Returns the action taken so the status file can report it.
+ */
+export function ensureBackup(asarPath, backupPath, currentVersion) {
+	if (!existsSync(backupPath)) {
+		copyFileSync(asarPath, backupPath);
+		return { backupAction: "created", backupVersion: currentVersion ?? null };
+	}
+	const backupVersion = readAsarVersion(backupPath);
+	// Refresh whenever we cannot PROVE the backup is this exact build: a stale
+	// backup would make `restore` downgrade the installation.
+	if (!backupVersion || !currentVersion || backupVersion !== currentVersion) {
+		copyFileSync(asarPath, backupPath);
+		return {
+			backupAction: "refreshed",
+			backupVersion: currentVersion ?? null,
+			previousBackupVersion: backupVersion,
+		};
+	}
+	return { backupAction: "kept", backupVersion };
+}
+
 /**
  * Patch the archive in place. Returns a status object; never throws past the
  * point where the archive could be left half-written (all patching happens in
@@ -204,15 +273,18 @@ export function patchAsar(asarPath) {
 	const fd = openSync(asarPath, "r+");
 	try {
 		const { header, jsonLen, jsonOffset, dataStart } = readHeader(fd);
+		const version = versionOfEntry(fd, header, dataStart);
 		const entry = findEntry(header, "lib/main.js");
-		if (!entry) return { status: "anchor-miss", detail: "lib/main.js entry not found" };
+		if (!entry) return { status: "anchor-miss", detail: "lib/main.js entry not found", version };
 		const offset = Number(entry.offset || 0);
 		const mainBuf = Buffer.alloc(entry.size);
 		readSync(fd, mainBuf, 0, entry.size, dataStart + offset);
 		const built = buildPatchedMain(mainBuf);
-		if (built.already) return { status: "already", detail: "marker present", backupPath };
-		if (!built.buf) return { status: "anchor-miss", detail: built.missing || "anchors not found", backupPath };
-		if (!existsSync(backupPath)) copyFileSync(asarPath, backupPath);
+		if (built.already) return { status: "already", detail: "marker present", backupPath, version };
+		if (!built.buf) return { status: "anchor-miss", detail: built.missing || "anchors not found", backupPath, version };
+		// Refresh a stale backup BEFORE the marker is written: right now the
+		// archive is still pristine, so the copy is a true original of THIS build.
+		const backup = ensureBackup(asarPath, backupPath, version);
 		// Recompute integrity for the patched entry (hashes keep their length).
 		if (entry.integrity) {
 			const blockSize = entry.integrity.blockSize || 4194304;
@@ -226,19 +298,25 @@ export function patchAsar(asarPath) {
 		if (jsonBuf.length > jsonLen) throw new Error("internal: header JSON grew beyond its slot");
 		writeSync(fd, padTo(jsonBuf, jsonLen, "header"), 0, jsonLen, jsonOffset);
 		fsyncSync(fd);
-		return { status: "patched", detail: `lib/main.js +${MARKER}`, backupPath };
+		return { status: "patched", detail: `lib/main.js +${MARKER}`, backupPath, version, ...backup };
 	} finally {
 		closeSync(fd);
 	}
 }
 
-/** Inspect without writing: is the marker present, is there a backup? */
+/** Inspect without writing: is the marker present, is the backup current? */
 export function inspectAsar(asarPath) {
 	const backupPath = backupPathFor(asarPath);
 	const out = { asarPath, backupPath, backup: existsSync(backupPath), patched: false };
 	const fd = openSync(asarPath, "r");
 	try {
 		const { header, dataStart } = readHeader(fd);
+		out.version = versionOfEntry(fd, header, dataStart);
+		if (out.backup) {
+			out.backupVersion = readAsarVersion(backupPath);
+			// A stale backup means `restore` would downgrade the installation.
+			out.backupStale = !out.version || !out.backupVersion || out.backupVersion !== out.version;
+		}
 		const entry = findEntry(header, "lib/main.js");
 		if (!entry) return { ...out, status: "anchor-miss", detail: "lib/main.js entry not found" };
 		const mainBuf = Buffer.alloc(entry.size);
@@ -251,12 +329,29 @@ export function inspectAsar(asarPath) {
 	}
 }
 
-/** Restore the pristine archive from the one-time backup. DSH must be quit. */
-export function restoreAsar(asarPath) {
+/**
+ * Restore the pristine archive from the backup. DSH must be quit.
+ * Refuses when the backup belongs to a different build than the installed
+ * archive — that would copy an older release over a newer one — unless
+ * `force` is set.
+ */
+export function restoreAsar(asarPath, options = {}) {
 	const backupPath = backupPathFor(asarPath);
 	if (!existsSync(backupPath)) return { status: "no-backup", backupPath };
+	const version = readAsarVersion(asarPath);
+	const backupVersion = readAsarVersion(backupPath);
+	const versionMatch = Boolean(version && backupVersion && version === backupVersion);
+	if (!versionMatch && !options.force) {
+		return {
+			status: "version-mismatch",
+			detail: `backup is ${backupVersion ?? "unknown"} but the installed app.asar is ${version ?? "unknown"}; refusing to overwrite it (re-run with force to override)`,
+			backupPath,
+			version,
+			backupVersion,
+		};
+	}
 	copyFileSync(backupPath, asarPath);
-	return { status: "restored", backupPath };
+	return { status: "restored", backupPath, version, backupVersion, versionMatch };
 }
 
 export function defaultProfileDir() {

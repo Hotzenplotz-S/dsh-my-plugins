@@ -67,7 +67,7 @@ try {
 if (-not $repoExists) {
   $body = @{
     name        = $Repo
-    description = "MY 系列自研 DeepSeek Harness 插件合集（窗口记忆、划词引用、图片气泡……）"
+    description = "MY 系列自研 DeepSeek Harness 插件合集（窗口记忆、划词引用、对话回退……）"
     private     = $false
     auto_init   = $true
   } | ConvertTo-Json

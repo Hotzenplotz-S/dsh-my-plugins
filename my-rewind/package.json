@@ -1,6 +1,6 @@
 {
   "name": "my-rewind",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "private": true,
   "type": "module",
   "description": "MY-Rewind 对话回退：消息上悬停点「回退」把对话撤回到该消息（文本+图片放回输入框），排队消息可一键撤回；/rewind、/undo 斜杠命令带消息选择器。v1 仅对话回退（文件还原规划中）。",

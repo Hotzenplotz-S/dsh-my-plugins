@@ -29,7 +29,12 @@ DSH 桌面版的主进程在 `app.asar` 内的 `lib/main.js` 里把主窗口尺�
 
 ## 安全设计
 
-- **自动备份**：首次写入前把原始 `app.asar` 复制为 `app.asar.mywb.bak`；
+- **自动备份 + 随版本刷新**：首次写入前把原始 `app.asar` 复制为 `app.asar.mywb.bak`。
+  DSH 升级换掉 `app.asar` 后，下次打补丁时会读归档内 `package.json` 的 `version`
+  与备份比对，**版本变了（或任一方读不到）就重建备份**——复制发生在写标记之前，
+  所以拿到的仍是这一版的原样归档。这样 `restore` 永远不会把旧版本覆盖到新版本上；
+- **还原版本守卫**：`restore` 先比对备份与已安装归档的版本号，不一致就拒绝执行
+  （确实要强还原时加 `--force`）；
 - **锚点校验**：所有锚点（注释块签名 + 精确字节长度 + 选项两行）必须全部
   唯一匹配，否则原样不动（DSH 升级导致代码变化时会安全地跳过）；
 - **幂等**：已打补丁的归档带 `/*my-wb*/` 标记，重复运行直接跳过；
@@ -44,8 +49,12 @@ DSH 桌面版的主进程在 `app.asar` 内的 `lib/main.js` 里把主窗口尺�
 `%USERPROFILE%\.dsh\profiles\desktop\my-window-bounds-status.json`：
 
 ```json
-{ "at": "...", "status": "patched", "detail": "lib/main.js +/*my-wb*/", "asarPath": "...", "backupPath": "..." }
+{ "at": "...", "status": "patched", "detail": "lib/main.js +/*my-wb*/", "asarPath": "...", "backupPath": "...",
+  "version": "0.2.1-rc.5", "backupAction": "kept", "backupVersion": "0.2.1-rc.5" }
 ```
+
+`backupAction`：`created`（首次建备份）/ `refreshed`（DSH 换了版本，备份已重建）/
+`kept`（版本一致，沿用原备份）。
 
 `status` 取值：`patched`（本次打上）/ `already`（已打过）/ `anchor-miss`
 （代码变了，未动归档）/ `busy|error`（写入失败，下次启动重试）/ `no-asar`
@@ -58,6 +67,10 @@ DSH 桌面版的主进程在 `app.asar` 内的 `lib/main.js` 里把主窗口尺�
 node cli.mjs status
 node cli.mjs install
 node cli.mjs restore
+
+# status 还会报 version / backupVersion / backupStale（备份是否过期）；
+# 备份与已安装版本不一致时 restore 会拒绝执行，确需强还原时加 --force
+node cli.mjs restore --force
 ```
 
 也可以用参数显式指定 app.asar 路径：`node cli.mjs status "C:\...\app.asar"`。
