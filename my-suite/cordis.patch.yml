@@ -1,7 +1,0 @@
-# MY-Suite 功能合集 —— 单行，浏览器 bundle 只挂在 bare 行上。
-# 2025-10-25 修正致命设计错误！功能行用子路径 specifier 会导致
-# dsh-client-modules 检测到"单个包 my-suite 被多行解析"→ 整包被拒 → bundle 不加载。
-# 以后再新增功能也只在这一行，功能开关在 client.js 内自定义实现。
-- insert:
-    - id: my-suite
-      name: my-suite

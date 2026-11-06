@@ -2,43 +2,43 @@
 
 [DeepSeek Harness（DSH）](https://github.com/deepseek-ai/DeepSeek-Harness) 的自研插件合集。
 每个插件一个目录，独立安装、独立卸载。命名约定：目录名 = 包名 = `my-<kebab>`，
-显示名 = `MY-{English} {中文名}`。所有插件均配备鲜艳的渐变圆角图标，方便识别。
+显示名 = `MY-{English} {中文名}`。
 
 ## 插件一览
 
 | 插件（= 目录 = 包名） | 显示名 | 功能 | 类型 |
 |------|--------|------|------|
-| [my-window-bounds](./my-window-bounds/) | MY-Window-Bounds 窗口记忆 | 让 DSH 桌面主窗口记住上次的大小、位置和最大化状态（等长 asar 补丁，自动备份、可一键还原） | 宿主 / 桌面主进程 |
 | [my-rewind](./my-rewind/) | MY-Rewind 对话回退 | 消息悬停「回退」撤回到任意历史消息（文本+图片放回输入框），排队消息一键撤回；/rewind、/undo 命令带消息选择器；日志只增不改（`dsh-rewind-plugin` 的 MY 重构版，修复浮层透明重叠） | 宿主 + 客户端 UI |
-| [my-quote](./my-quote/) | MY-Quote 划词引用 | 鼠标选中 AI 回复的文字，弹出「引用」按钮一键复制到输入框 | 客户端 UI |
-| [my-suite](./my-suite/) | MY-Suite 功能合集 | 把纯客户端小功能合装成一张卡片，当前收录「划词引用」。**与 my-quote 二选一**，别同时装 | 客户端 UI |
-| my-plugin-updates（开发中，占位桩） | MY-Plugin-Updates 插件升级 | 计划：检查并升级所有市场插件（自动排除官方与本地开发插件） | 客户端 UI |
 
-> **my-image-chip（图片气泡）已于 2026-11-04 按用户要求移除**，历史版本可从本仓库提交历史找回。
+> **已移除的插件**（保留在此说明，代码可从提交历史找回）：
+> - `my-image-chip`（图片气泡）— 2026-11-04 按用户要求移除
+> - `my-quote`（划词引用）— 2026-11-06 移除，官方 0.2.2 起内置 `@deepseek-ai/dsh-message-quotes`
+> - `my-suite`（客户端功能合集，仅含划词引用）— 2026-11-06 移除，同上被官方覆盖
+> - `my-plugin-updates`（插件升级检查，占位桩）— 2026-11-06 移除，官方插件页已有「有新版本」提示
+> - `my-window-bounds`（窗口记忆）— 2026-11-06 移除，取决于 asar 补丁，维护成本高于收益
 
 ## 安装方法
 
 ### 方式一：远程安装（推荐，跨设备可用）
 
-不需要下载代码，直接让 pnpm 从本仓库拉取指定子目录。**目录名就是包名**，
-把下面命令里的 `my-quote` 换成你要装的插件即可（`my-window-bounds` / `my-rewind` / `my-suite`）。
+不需要下载代码，直接让 pnpm 从本仓库拉取指定子目录。**目录名就是包名**（当前只有 `my-rewind`）。
 
 在 DSH 里让助手执行 `plugin_manager install_bundle`，其 `target` 填：
 
 ```
-github:Hotzenplotz-S/dsh-my-plugins#path:/my-quote
+github:Hotzenplotz-S/dsh-my-plugins#path:/my-rewind
 ```
 
 或者自己跑命令行（把 `desktop` 换成你的 profile 名）：
 
 ```powershell
-dsh plugin --profile desktop add "github:Hotzenplotz-S/dsh-my-plugins#path:/my-quote"
+dsh plugin --profile desktop add "github:Hotzenplotz-S/dsh-my-plugins#path:/my-rewind"
 ```
 
 装完后 profile 的 `package.json` 里会记录成：
 
 ```json
-"my-quote": "git+https://github.com/Hotzenplotz-S/dsh-my-plugins.git#path:/my-quote"
+"my-rewind": "git+https://github.com/Hotzenplotz-S/dsh-my-plugins.git#path:/my-rewind"
 ```
 
 这是**可移植**的引用——同步到另一台电脑后能直接重装；相比之下 `link:D:/...` 的绝对路径
@@ -46,13 +46,15 @@ dsh plugin --profile desktop add "github:Hotzenplotz-S/dsh-my-plugins#path:/my-q
 
 **前提**：本机要有 `git`（pnpm 走 git 协议克隆）。更新插件时重新执行一次指向同一 spec 的安装即可。
 
+> 注意：pnpm 对 `github:` 依赖按**提交哈希**锁定（lockfile 里是 `codeload.github.com/.../tar.gz/<sha>`）。
+> 推送新提交后要拿到新代码，需先 `remove_bundle` 再 `install_bundle`（或用 `pnpm update`）。
+
 ### 方式二：下载 ZIP（无需 git）
 
 1. 本页面上方 **Code → Download ZIP**，解压；
 2. 在 DSH 中让助手执行 `plugin_manager install_bundle`，target 指向解压出来的
-   单个插件目录（例如 `.../dsh-my-plugins-main/my-window-bounds`），
-   或在插件管理页手动安装本地 Bundle；
-3. 按各插件 README 的说明操作（`my-window-bounds` 需完全退出 DSH 再启动才生效）。
+   单个插件目录（例如 `.../dsh-my-plugins-main/my-rewind`），
+   或在插件管理页手动安装本地 Bundle。
 
 ### 方式三：git clone（本地开发用）
 
@@ -66,13 +68,9 @@ git clone https://github.com/Hotzenplotz-S/dsh-my-plugins.git
 
 ## 注意事项
 
-- **my-window-bounds 会给 DSH 的 `app.asar` 打补丁**（等长替换，附自动备份与还原脚本），
-  原理与风险见其 [README](./my-window-bounds/README.md)。DSH 升级后补丁会自动重打，
-  锚点对不上时会安全跳过并写状态文件，不会损坏安装。装完需**完全退出 DSH 再启动**。
 - **my-rewind** 与原版 `dsh-rewind-plugin` **不要同时启用**（命令名 rewind/undo/rewind-plugin 冲突；
   my-rewind 已兼容旧会话的隐藏状态，可直接替换）。
-- **my-suite 与 my-quote 不要同时装**：两者都提供划词引用，同开会看到两份气泡。
-- my-quote 是纯客户端插件，安装启用后立即生效，无需重启。
+- 划词引用无需再装自研插件：DSH 0.2.2 起官方内置 `@deepseek-ai/dsh-message-quotes`。
 - 各插件独立安装、独立管理，没有 bundle 级别的耦合。
 
 ## 目录即仓库

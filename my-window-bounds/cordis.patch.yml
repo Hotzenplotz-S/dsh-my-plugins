@@ -1,4 +1,0 @@
-- insert:
-    - id: my-window-bounds
-      name: my-window-bounds
-      config: {}
